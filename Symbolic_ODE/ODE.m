@@ -233,7 +233,7 @@ disp('ODE Version: 13 March 2014 (Mathieu)')
             
         end
         
-        function [T,Y] = generateData(thisODE,trange,x_init,p_init,more,sig)
+        function [T,Y] = generateData(thisODE,trange,x_init,p_init,more,sig,seed)
             fn = thisODE.make();
            
             MU = zeros(1,length(x_init));
@@ -243,7 +243,7 @@ disp('ODE Version: 13 March 2014 (Mathieu)')
             
             fn_new = @(t,y) fn.fn(t,y,p_init,more);
             [T,Y] = ode45(fn_new,trange,x_init);
-            
+            rng(seed);
             randNum = mvnrnd(MU,SIGMA,length(T));
             noiseStd = std(randNum);
             signalMean = mean(Y);
