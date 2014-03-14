@@ -217,8 +217,7 @@ else                                    % States given on log scale
         lik.more.more.more = likmoremoremore;        
     end
         
-%    likfn = make_id;   <---- This default value should be set somewhere at
-%    beginning? See issue #3
+
 end
 
 %                  <---------------- This section doesn't make sense now?
