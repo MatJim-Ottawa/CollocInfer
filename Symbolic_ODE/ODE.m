@@ -10,6 +10,8 @@ classdef ODE < handle
 %           - log data at source function?        
 %           - Export functions to file?
 %           - Write unit testing
+%           - Added dependency on LogTrans, needs to be tested!?
+
 
 
     
@@ -35,6 +37,9 @@ classdef ODE < handle
         % exp_paramvector_bool Boolean value determines if parameter values will be
         % exponentiated in the equations returned by make(). Defaults to 0.
         exp_paramvector_bool
+        % exp_paramvector_bool Boolean value determines if parameter values will be
+        % exponentiated in the equations returned by make(). Defaults to 0.
+        log_statevector_bool
         % f_struc_representation Contains result of computeDerivatives()
         % in a struc for later use by make().
         f_struc_representation
@@ -55,6 +60,9 @@ classdef ODE < handle
 %              
 %             TODO:
 %                 -Lots of error handling
+
+%  Last modified 25 Feburary 2014 (Mathieu)
+disp('ODE Version: 13 March 2014 (Mathieu)')
 %              
 %           Initialize:
 %             
@@ -69,7 +77,7 @@ classdef ODE < handle
             
 %               Initial Value of exp_paramvector_bool
             thisODE.exp_paramvector_bool = 0;
-            
+            thisODE.log_statevector_bool = 0;
             
 %           Assign:
 %             
@@ -114,11 +122,31 @@ classdef ODE < handle
             % Switch value of exp_paramvector_bool
             thisODE.exp_paramvector_bool = not(thisODE.exp_paramvector_bool);
         end
+          function SetLogState(thisODE)
+%             SetLogState Sets internal flag(log_statevector_bool)
+%             to indicate that the user is requesting equations where the
+%             stats are on a log scale. Each call will switch the value to the opposite of what is currently set. 
+%         
+%             TODO:
+%                 -Lots of error handling
+            
+            % Message to user.
+            switch thisODE.log_statevector_bool
+                case {0} 
+                    disp(['NOTE: ODE will now accept state vector on log scale!'])
+                case {1} 
+                    disp(['NOTE: ODE will NO LONGER accept state vector on log scale!'])
+            end
+            
+            % Switch value of exp_paramvector_bool
+            thisODE.log_statevector_bool = not(thisODE.log_statevector_bool);
+        end
         
         function displayResult(thisODE)
 %           displayResult Output results from computeDerivatives.
 %           computeDerivatives must be called before this function.
-            
+            disp('Value for fn')
+            disp(thisODE.DE_Symbolic)
             disp('Value for dfdx')
             disp(thisODE.Display_Symbolic{1})
             disp('Value for dfdp')
@@ -231,12 +259,13 @@ classdef ODE < handle
             f.d2fdx2 = @thisODE.d2fdx2;
             f.d2fdxdp = @thisODE.d2fdxdp;
             
+                        
         end
         
 
     end
     
-    methods (Access=private)
+    methods 
         
         function result = Jacobian(~,F,y)
            % Replace the symbolic Jacobian. Will compute Jacobian on each
@@ -267,6 +296,10 @@ classdef ODE < handle
             if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
             end
+           if thisODE.log_statevector_bool == 1
+                x = exp(x);
+           end
+            
 %             Need p to be a row vector.
             if isvector(p) == 0
                 disp('p is not a vector!')
@@ -283,30 +316,63 @@ classdef ODE < handle
             res = thisODE.f_struc_representation.fn(0,xcol{:},pcol{:},t);
             if isvector(x) == 1
                 result = reshape(res,length(x),1);
+                
             else
                 result = reshape(res,length(xcol{1}),length(xcol));
             end
+            
+
+
+          if thisODE.log_statevector_bool == 1
+                result = result./x';
+           end
            
         end
         
         function result = dfdx(thisODE,t,x,p,more)
+           % Order is important since we dont want to exponentiate before fn call 
+           if thisODE.log_statevector_bool == 1
+                x1 = thisODE.fn(t,x,p,more)';
+                x = exp(x);
+           end
             if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
             end 
             
+
+
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
             res = thisODE.f_struc_representation.dfdx(0,xcol{:},pcol{:},t);
             result = reshape(res,length(xcol{1}),length(xcol),length(xcol));
-           
+            
+           if thisODE.log_statevector_bool == 1 
+    
+    
+            [~,m,n] = size(result);
+            for i = 1:m
+                for j = 1:n
+                    result(:,i,j) = result(:,i,j).*x(:,j)./x(:,i);
+                end
+                result(:,i,i) = result(:,i,i) - x1(:,i);
+            end
+         end
+
         end
         
         function result = dfdp(thisODE,t,x,p,more)
+           % Order is important since we dont want to exponentiate before fn call 
+           if thisODE.log_statevector_bool == 1             
+                x = exp(x);
+           end
+            
             if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
             end
+            
+
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
@@ -314,15 +380,29 @@ classdef ODE < handle
             
             res = thisODE.f_struc_representation.dfdp(0,xcol{:},pcol{:},t);
             result = reshape(res,length(xcol{1}),length(xcol),length(pcol));
-           
+
+           if thisODE.log_statevector_bool == 1             
+                [~,m,n] = size(x);
+                for i = 1:m
+                    for j = 1:n
+                        result(:,i,j) = result(:,i,j)./x(:,i);
+                    end
+                end
+           end            
+
         end
         
         function result = d2fdx2(thisODE,t,x,p,more)
+           % Order is important since we dont want to exponentiate before fn call 
+           if thisODE.log_statevector_bool == 1
+                x1 = thisODE.dfdx(t,x,p,more);
+                x = exp(x);
+           end
+            
            if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
            end
-            
-           
+
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
@@ -330,21 +410,63 @@ classdef ODE < handle
             res = thisODE.f_struc_representation.d2fdx2(0,xcol{:},pcol{:},t);
             result = reshape(res,length(xcol{1}),length(xcol),length(xcol),length(xcol));
            
+           if thisODE.log_statevector_bool == 1
+                [~,ll,mm,nn] = size(result);
+                for i = 1:ll
+                    for j = 1:mm
+                        for k = 1:nn
+                            result(:,i,j,k) = result(:,i,j,k).*x(:,j).*x(:,k)./x(:,i);
+                        end
+                    end
+                end
+
+                for i = 1:ll
+                    for j = 1:mm
+                        result(:,i,i,j) = result(:,i,i,j) - x1(:,i,j);
+                        result(:,i,j,i) = result(:,i,j,i) - x1(:,i,j);
+                        result(:,i,j,j) = result(:,i,j,j) + x1(:,i,j);
+                    end
+                end
+           end
         end
         
         function result = d2fdxdp(thisODE,t,x,p,more)
+            
+           % Order is important since we dont want to exponentiate before fn call 
+           if thisODE.log_statevector_bool == 1
+                x1 = thisODE.dfdp(t,x,p,more);
+                x = exp(x);
+           end
+           
             if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
             end
             
-            
+
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
             res = thisODE.f_struc_representation.d2fdxdp(0,xcol{:},pcol{:},t);
             result = reshape(res,length(xcol{1}),length(xcol),length(xcol),length(pcol));
-           
+             
+           if thisODE.log_statevector_bool == 1
+                [~,ll,mm,nn] = size(result);
+
+                for i = 1:ll
+                    for j = 1:mm
+                        for k = 1:nn
+                            result(:,i,j,k) = result(:,i,j,k).*x(:,j)./x(:,i);
+                        end
+                    end
+                end
+
+                for i = 1:ll
+                    for j = 1:nn
+                        result(:,i,i,j) = result(:,i,i,j) - x1(:,i,j);
+                    end
+                end
+           end
         end
     end
     
