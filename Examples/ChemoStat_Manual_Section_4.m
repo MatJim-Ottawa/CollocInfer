@@ -26,9 +26,10 @@
 % addpath('ChemoStat') % Needed?
 
 %Should add all needed paths
+cd('/Users/Jim/Documents/MATLAB/CollocInferMat')
 add_collocinfer_paths_local;
-cd('E:/CollocInfer/')
-data = dlmread('../DATA/ChemoExampleData.csv');
+
+data = dlmread('./Examples/DATA/ChemoExampleData.csv');
 ChemoData = data;
 
 
@@ -66,22 +67,29 @@ DEfd = smooth_basis(ChemoTime, ChemoData, fdPar(ChemoBasis,int2Lfd(2),10));
 % Get initial coefs after smoothing
 coefs0 = getcoef(DEfd);
 
+
+%Symbolic ODE used to create function handles (1,0) => parameter exp, no
+%log of state vector
 [ODE,CHEMO] = make_ODE_CHEMO_section4(1,0);
 
+%lambda value is important
 lambda = 1e5;
+
 [lik, proc] = LS_setup(CHEMO, ChemoTime, coefs0, ChemoBasis, ...
                        lambda, [],[], ChemoData, [], [], ...
                        [], 0, 1);
                    
                    
 
+tic;                  
 res1 = ParsMatchOpt(log(RMpars), coefs0, proc);
+toc
 
-
+tic;
 res3 = outeropt(ChemoTime,ChemoData,coefs0,res1,lik,proc);
-
+toc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% Example of using likfn in ChemoStat Model
 
 ChemoData2 = [log(exp(ChemoData(:,1)) + exp(ChemoData(:,2))),ChemoData(:,3)];
 
@@ -95,14 +103,14 @@ RMobsfn = @(t,x,p,more) [log(exp(x(:,1)) +exp(x(:,2))),x(:,3)];
 coef02 = coefs0;
 coef02(:,1:2) = 0;
 
-res1R = dlmread('../DATA/res1pars.csv');
-Fres3R = dlmread('../DATA/Fres3pars.csv');
+res1R = dlmread('./Examples/DATA/res1pars.csv');
+Fres3R = dlmread('./Examples/DATA/Fres3pars.csv');
 
 
 % Look at FitMatchOpt?
-Fres3 = FitMatchOpt(coef02, [1:2], res1R', proc2);
+Fres3 = FitMatchOpt(coef02, [1:2], res1, proc2);
 
-res32 = outeropt(ChemoTime,ChemoData2,Fres3R,res1R',lik2,proc2);
+res32 = outeropt(ChemoTime,ChemoData2,Fres3,res1,lik2,proc2);
 
 %CollocInferPlots(coefs0,log(RMpars),lik,proc,ChemoTime,ChemoData2)
 
