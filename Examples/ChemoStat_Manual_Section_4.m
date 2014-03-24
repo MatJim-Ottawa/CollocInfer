@@ -27,7 +27,9 @@
 
 %Should add all needed paths
 add_collocinfer_paths_local;
-
+cd('E:/CollocInfer/')
+data = dlmread('../DATA/ChemoExampleData.csv');
+ChemoData = data;
 
 
 ChemoTime = [0:200];
@@ -45,29 +47,29 @@ rng = [0,max(ChemoTime)];
 
 % Will use Symbolic ODE to generate data and function handles for problem.
 
-[ODE,LOG_CHEMO] = make_ODE_CHEMO_section4(1,1);
+% [ODE,LOG_CHEMO] = make_ODE_CHEMO_section4(1,1);
 
 % CHEMO contains function handles for problem
 
 % Data will contain data with noise(indept normal) w/ sigma = 0.10 ,seeded
 % number
-[T,ChemoData] = ODE.generateData(ChemoTime,log(x0),log(RMpars),[],0.10,1001);
+% [T,ChemoData] = ODE.generateData(ChemoTime,log(x0),log(RMpars),[],0.10,1001);
 
 
 
-knots      = rng(1):0.5:rng(2); 
+knots      = rng(1):1:rng(2); 
 nbasis     = length(knots)+2;
 ChemoBasis = create_bspline_basis(rng,nbasis,4,knots);
 
-DEfd = smooth_basis(ChemoTime, ChemoData, fdPar(ChemoBasis,int2Lfd(2),1e-6));
+DEfd = smooth_basis(ChemoTime, ChemoData, fdPar(ChemoBasis,int2Lfd(2),10));
    
 % Get initial coefs after smoothing
 coefs0 = getcoef(DEfd);
 
 [ODE,CHEMO] = make_ODE_CHEMO_section4(1,0);
 
-lambda = 1e-4;
-[lik, proc] = LS_setup(CHEMO.fn, ChemoTime, coefs0, ChemoBasis, ...
+lambda = 1e5;
+[lik, proc] = LS_setup(CHEMO, ChemoTime, coefs0, ChemoBasis, ...
                        lambda, [],[], ChemoData, [], [], ...
                        [], 0, 1);
                    
@@ -75,7 +77,7 @@ lambda = 1e-4;
 
 res1 = ParsMatchOpt(log(RMpars), coefs0, proc);
 
-% Local Min?
+
 res3 = outeropt(ChemoTime,ChemoData,coefs0,res1,lik,proc);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,20 +85,39 @@ res3 = outeropt(ChemoTime,ChemoData,coefs0,res1,lik,proc);
 
 ChemoData2 = [log(exp(ChemoData(:,1)) + exp(ChemoData(:,2))),ChemoData(:,3)];
 
-
+% Define likefn
 RMobsfn = @(t,x,p,more) [log(exp(x(:,1)) +exp(x(:,2))),x(:,3)];
 
-[lik, proc] = LS_setup(CHEMO.fn, ChemoTime, coefs0, ChemoBasis, ...
+[lik2, proc2] = LS_setup(CHEMO, ChemoTime, coefs0, ChemoBasis, ...
                        lambda, [],[], ChemoData2, [], [], ...
                        [], 0, 1, [],RMobsfn);
             
 coef02 = coefs0;
 coef02(:,1:2) = 0;
 
+res1R = dlmread('../DATA/res1pars.csv');
+Fres3R = dlmread('../DATA/Fres3pars.csv');
 
-res1 = FitMatchOpt(coef02, [1:2], log(RMpars), proc);
 
-res3 = outeropt(ChemoTime,ChemoData2,coef02,log(RMpars),lik,proc);
+% Look at FitMatchOpt?
+Fres3 = FitMatchOpt(coef02, [1:2], res1R', proc2);
+
+res32 = outeropt(ChemoTime,ChemoData2,Fres3R,res1R',lik2,proc2);
+
+%CollocInferPlots(coefs0,log(RMpars),lik,proc,ChemoTime,ChemoData2)
+
+% exp(res32)
+% 
+% ans =
+% 
+%   Columns 1 through 5
+% 
+%          0.198115034205939        0.0246683264054978         0.122626625094734          551792849.793551          1743.86577780405
+% 
+%   Columns 6 through 9
+% 
+%           4880819.71134693          1.01067630939406          1002091950.44141         0.301493706115853
+
 
 format long g;
 

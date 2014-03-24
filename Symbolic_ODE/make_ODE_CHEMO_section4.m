@@ -45,5 +45,5 @@ odeproblem.computeDerivatives();
 % Get function handles for ODE, what collocinfer is expecting
 CHEMO = odeproblem.make();
 
-odeproblem.plot([0,200],log([50,50,2]),log([0.2 ,0.025 ,0.125 ,2.2e4 ,1e5, 5e6 ,1 ,1e9 ,0.3]),[]);
+% odeproblem.plot([0,200],log([50,50,2]),log([0.2 ,0.025 ,0.125 ,2.2e4 ,1e5, 5e6 ,1 ,1e9 ,0.3]),[]);
 end
