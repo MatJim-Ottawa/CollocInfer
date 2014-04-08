@@ -229,7 +229,9 @@ disp('ODE Version: 13 March 2014 (Mathieu)')
             fn = thisODE.make();
            
             fn_new = @(t,y) fn.fn(t,y,p_init,more);
-            ode45(fn_new,trange,x_init);
+            [T,Y] = ode45(fn_new,trange,x_init);
+            figure();
+            plot(Y(:,1),Y(:,2));
             
         end
         
