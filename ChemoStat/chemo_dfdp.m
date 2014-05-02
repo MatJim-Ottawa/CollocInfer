@@ -2,6 +2,8 @@ function dfdpval = chemo_dfdp(times, y, p, more)
 
 p = exp(p);
 
+Qsfactor = 0;
+
 p1  = p(1);
 p2  = p(2);
 p3  = p(3);
@@ -34,15 +36,15 @@ dfdpval = zeros(nt,ny,np);
 
 % p3
 
-dfdpval(:,2,3) = -(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(2.*p13.*p15.*y2.*(y4 + y5) - p13.*y2.*(y4 + y5).*(p1.*p3.^2.*y2.^2 + p1.*p4.*y3.*p3.*y2 - p4.*y3)) + p13.*p15.*y2.*(y4 + y5).*(exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)) + 1) + p4.*p13.*y2.*y3.*exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)).*(y4 + y5))./(p15 + p15.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(p1.*(p3.*y2 - p16 + p4.*y3))).^2; 
-dfdpval(:,3,3) = (p4.*p13.*y3.*(y4 + y5).*(y2./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1) + (p1.*y2.*(p3.*y2 + p4.*y3))./(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(exp(-p1.*(p3.*y2 - p16 + p4.*y3)) + 1).^2)))./(p15 + (p3.*y2 + p4.*y3)./(exp(-p1.*(p3.*y2 - p16 + p4.*y3)) + 1)).^2;
-dfdpval(:,4,3) = -(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(p13.*p14.*y2.*y4.*(p1.*p3.^2.*y2.^2 + 2.*p1.*p3.*p4.*y2.*y3 + p1.*p4.^2.*y3.^2) - 2.*p13.*p14.*p15.*y2.*y4) - p13.*p14.*p15.*y2.*y4.*(exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)) + 1))./(p15 + p15.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(p1.*(p3.*y2 - p16 + p4.*y3))).^2;
+dfdpval(:,2,3) = -(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(2.*p13.*p15.*y2.*(y4 + y5) - p13.*y2.*(y4 + y5).*(Qsfactor.*p3.^2.*y2.^2 + Qsfactor.*p4.*y3.*p3.*y2 - p4.*y3)) + p13.*p15.*y2.*(y4 + y5).*(exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1) + p4.*p13.*y2.*y3.*exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(y4 + y5))./(p15 + p15.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3))).^2; 
+dfdpval(:,3,3) = (p4.*p13.*y3.*(y4 + y5).*(y2./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1) + (Qsfactor.*y2.*(p3.*y2 + p4.*y3))./(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(exp(-Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1).^2)))./(p15 + (p3.*y2 + p4.*y3)./(exp(-Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1)).^2;
+dfdpval(:,4,3) = -(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(p13.*p14.*y2.*y4.*(Qsfactor.*p3.^2.*y2.^2 + 2.*Qsfactor.*p3.*p4.*y2.*y3 + Qsfactor.*p4.^2.*y3.^2) - 2.*p13.*p14.*p15.*y2.*y4) - p13.*p14.*p15.*y2.*y4.*(exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1))./(p15 + p15.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3))).^2;
 
 % p4
 
-dfdpval(:,2,4) = (p3.*p13.*y2.*(y4 + y5).*(y3./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1) + (p1.*y3.*(p3.*y2 + p4.*y3))./(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(exp(-p1.*(p3.*y2 - p16 + p4.*y3)) + 1).^2)))./(p15 + (p3.*y2 + p4.*y3)./(exp(-p1.*(p3.*y2 - p16 + p4.*y3)) + 1)).^2; 
-dfdpval(:,3,4) = -(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(2.*p13.*p15.*y3.*(y4 + y5) - p13.*y3.*(y4 + y5).*(p1.*p4.^2.*y3.^2 + p1.*p3.*y2.*p4.*y3 - p3.*y2)) + p13.*p15.*y3.*(y4 + y5).*(exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)) + 1) + p3.*p13.*y2.*y3.*exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)).*(y4 + y5))./(p15 + p15.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(p1.*(p3.*y2 - p16 + p4.*y3))).^2;
-dfdpval(:,4,4) = -(exp(p1.*(p3.*y2 - p16 + p4.*y3)).*(p13.*p14.*y3.*y4.*(p1.*p3.^2.*y2.^2 + 2.*p1.*p3.*p4.*y2.*y3 + p1.*p4.^2.*y3.^2) - 2.*p13.*p14.*p15.*y3.*y4) - p13.*p14.*p15.*y3.*y4.*(exp(2.*p1.*(p3.*y2 - p16 + p4.*y3)) + 1))./(p15 + p15.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(p1.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(p1.*(p3.*y2 - p16 + p4.*y3))).^2;
+dfdpval(:,2,4) = (p3.*p13.*y2.*(y4 + y5).*(y3./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1) + (Qsfactor.*y3.*(p3.*y2 + p4.*y3))./(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(exp(-Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1).^2)))./(p15 + (p3.*y2 + p4.*y3)./(exp(-Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1)).^2; 
+dfdpval(:,3,4) = -(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(2.*p13.*p15.*y3.*(y4 + y5) - p13.*y3.*(y4 + y5).*(Qsfactor.*p4.^2.*y3.^2 + Qsfactor.*p3.*y2.*p4.*y3 - p3.*y2)) + p13.*p15.*y3.*(y4 + y5).*(exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1) + p3.*p13.*y2.*y3.*exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(y4 + y5))./(p15 + p15.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3))).^2;
+dfdpval(:,4,4) = -(exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)).*(p13.*p14.*y3.*y4.*(Qsfactor.*p3.^2.*y2.^2 + 2.*Qsfactor.*p3.*p4.*y2.*y3 + Qsfactor.*p4.^2.*y3.^2) - 2.*p13.*p14.*p15.*y3.*y4) - p13.*p14.*p15.*y3.*y4.*(exp(2.*Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1))./(p15 + p15.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p3.*y2.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + p4.*y3.*exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3))).^2;
 
 % p5
 
@@ -89,13 +91,13 @@ dfdpval(:,3,12) = (p9*y1*y3)/(p11 + y1);
 
 % p13
 
-dfdpval(:,2,13) = -(p3.*y2.*(y4 + y5))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1)); 
-dfdpval(:,3,13) = -(p4.*y3.*(y4 + y5))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1));
-dfdpval(:,4,13) = (p14.*y4.*(p3.*y2 + p4.*y3))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1));
+dfdpval(:,2,13) = -(p3.*y2.*(y4 + y5))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1)); 
+dfdpval(:,3,13) = -(p4.*y3.*(y4 + y5))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1));
+dfdpval(:,4,13) = (p14.*y4.*(p3.*y2 + p4.*y3))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1));
 
 % p14
 
-dfdpval(:,4,14) = (p13.*y4.*(p3.*y2 + p4.*y3))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(p1.*(p3.*y2 - p16 + p4.*y3)) + 1));
+dfdpval(:,4,14) = (p13.*y4.*(p3.*y2 + p4.*y3))./(p15 + (p3.*y2 + p4.*y3)./(1./exp(Qsfactor.*(p3.*y2 - p16 + p4.*y3)) + 1));
 
 % p15
 
@@ -105,9 +107,9 @@ dfdpval(:,4,15) = -(p13*p14*y4*(p3*y2 + p4*y3))/(p15 + (p3*y2 + p4*y3)/(exp(-p1*
 
 % p16
 
-dfdpval(:,2,16) = -(p1*p3*p13*y2*(y4 + y5)*(p3*y2 + p4*y3))/(exp(p1*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2); 
-dfdpval(:,3,16) = -(p1*p4*p13*y3*(y4 + y5)*(p3*y2 + p4*y3))/(exp(p1*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2); 
-dfdpval(:,4,16) = (p1*p13*p14*y4*(p3*y2 + p4*y3)^2)/(exp(p1*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2);
+dfdpval(:,2,16) = -(p1*p3*p13*y2*(y4 + y5)*(p3*y2 + p4*y3))/(exp(Qsfactor*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2); 
+dfdpval(:,3,16) = -(p1*p4*p13*y3*(y4 + y5)*(p3*y2 + p4*y3))/(exp(Qsfactor*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2); 
+dfdpval(:,4,16) = (p1*p13*p14*y4*(p3*y2 + p4*y3)^2)/(exp(Qsfactor*(p3*y2 - p16 + p4*y3))*(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1)^2*(p15 + (p3*y2 + p4*y3)/(exp(-p1*(p3*y2 - p16 + p4*y3)) + 1))^2);
 
 for k=1:16
     dfdpval(:,:,k) = dfdpval(:,:,k).*p(k);

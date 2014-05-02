@@ -31,7 +31,7 @@ add_collocinfer_paths_local;
 
 data = dlmread('./Examples/DATA/ChemoExampleData.csv');
 ChemoData = data;
-
+ChemoLogData = log(data);
 
 ChemoTime = [0:200];
 
@@ -79,6 +79,7 @@ lambda = 1e5;
                        lambda, [],[], ChemoData, [], [], ...
                        [], 0, 1);
                    
+[f, grad] = SplineCoefs(coefs0, ChemoTime, ChemoLogData, log(RMpars), lik, proc);
                    
 
 tic;                  

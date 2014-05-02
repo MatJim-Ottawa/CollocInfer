@@ -1,11 +1,15 @@
 function fnval = chemo_fun1(times, y, p, more)
 %  this version for calling from ode45, computes log-scale RHS
+%  Note:  This version replaces 100 in the R code 
+%  by Qsfactor in the definition of Qs.
+%  Probably this value should be smaller since exp will blow up otherwise
+Qsfactor = 0;
 p = exp(p);
 y = exp(y);
 fnval = zeros(5,1);
 Q  = p(3).*y(2) + p(4).*y(3);
-Qs = Q.*exp(10.*(Q - p(16)))./(1 + exp(10.*(Q - p(16)))) + p(16)./ ...
-    (1 + exp(10.*(Q - p(16))));
+Qs = Q.*exp(Qsfactor.*(Q - p(16)))./(1 + exp(Qsfactor.*(Q - p(16)))) + ...
+    p(16)./ (1 + exp(Qsfactor.*(Q - p(16))));
 fnval = zeros(5,1);
 
 fnval(1) = p(6).*(p(5) - y(1)) - p(12).*y(2).*y(1)./ ...

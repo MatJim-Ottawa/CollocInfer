@@ -74,7 +74,7 @@ end
 %  ------------------------------------------------------------------------
 
 if nargin < 16, likmore    = [];    end
-if nargin < 15 || isempty(likfn),   likfn    = make_id;end
+if nargin < 15 || isempty(likfn),   likfn    = make_id; end
 if nargin < 14 || isempty(discrete), discrete = 0;      end
 if nargin < 13 || isempty(posproc),  posproc  = 0;      end
 if nargin < 12 || isempty(poslik),   poslik   = 0;      end
