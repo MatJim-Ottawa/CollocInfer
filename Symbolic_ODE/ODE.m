@@ -43,6 +43,9 @@ classdef ODE < handle
         % f_struc_representation Contains result of computeDerivatives()
         % in a struc for later use by make().
         f_struc_representation
+        % Display_Symbolic_Label Contains the labels for each element of
+        % Display_Symbolic
+        Display_Symbolic_Label
 
         
     end
@@ -87,19 +90,30 @@ disp('ODE Version: 13 March 2014 (Mathieu)')
             thisODE.statevector_Symbolic = x;
             thisODE.time_Symbolic = t;
             
+            thisODE.Display_Symbolic_Label{1} = 'fn';
+            thisODE.Display_Symbolic_Label{2} = 'dfdx';
+            thisODE.Display_Symbolic_Label{3} = 'dfdp';
+            thisODE.Display_Symbolic_Label{4} = 'd2fdx2';
+            thisODE.Display_Symbolic_Label{5} = 'd2fdxdp';
             
 
         end
        
-        function functionHandle = returnMatlabFunctions(thisODE)
+        function functionHandle = returnMatlabFunctions(thisODE,filePath)
 %              returnMatlabFunctions Function for debugging.
 %              Returns function handles derived from the symbolic equations DE_Symbolic.
 %              IE conversion from symbolic -> @ functions using
 %              matlabFunction().
-%              Delete this later.
             
-            for i=1:length(thisODE.DE_Symbolic)
-                functionHandle{i} = matlabFunction(thisODE.DE_Symbolic(i));
+            if ~isempty(filePath)
+                    matlabFunction(thisODE.DE_Symbolic,'file',[filePath,'\', thisODE.Display_Symbolic_Label{1},'.m']);
+                end
+            
+            for i=1:length(thisODE.Display_Symbolic)
+                if ~isempty(filePath)
+                    matlabFunction(thisODE.Display_Symbolic{i},'file',[filePath,'\', thisODE.Display_Symbolic_Label{i+1},'.m']);
+                end
+                functionHandle{i} = matlabFunction(thisODE.Display_Symbolic{i});
             end
         end
         

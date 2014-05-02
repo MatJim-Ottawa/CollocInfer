@@ -63,10 +63,10 @@ odeproblem = ODE(f,t,x,p);
 
 % Compute the derivatives needed for collocinfer
 odeproblem.computeDerivatives();
-
+odeproblem.returnMatlabFunctions('testing');
 % Get function handles for ODE, what collocinfer is expecting
 ML = odeproblem.make();
-%odeproblem.displayResult();
+odeproblem.displayResult();
 
 
 
