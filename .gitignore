@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 
 add_collocinfer_paths_local.m
+=======
+*.Rhistory
+>>>>>>> origin/Working-Copy---Mathieu
