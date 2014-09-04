@@ -7,15 +7,13 @@
 
 %  add paths to required functions
 
-addpath('../../fdaM')
+addpath('../fdaM')
 addpath('fhn')
 addpath('SSE')
 addpath('id')
 addpath('logtrans')
 addpath('logstate_lik')
-addpath('genlin')
 addpath('findif')
-addpath('loggenlin')
 addpath('ChemoStat')
 
 % The Chemostat equations represent a four-species Chemostat plus the  
@@ -86,7 +84,7 @@ addpath('ChemoStat')
 
 %  if this .mat file is set up, go to line 172
 
-load ChemoStatDemoSetup
+%load ChemoStatDemoSetup
 
 % First we load up some data
 
@@ -130,7 +128,10 @@ ChemoVarNames = ['N '; 'C1'; 'C2'; 'B '; 'S '];
 % Parameters 'p1' and 'p2' represent relative palatability of the two algal
 % clones, as such only one can be estimated and we fix p2 = 0. 
 
-logpars = [ChemoPars(1:2),log(ChemoPars(3:16))];
+% logpars = [ChemoPars(1:2),log(ChemoPars(3:16))];
+
+% Changed to match R code
+logpars = log(ChemoPars);
 
 ChemoLogData = log(ChemoData);
 
@@ -184,10 +185,13 @@ coefs0 = getcoef(DEfd);
 
 %  set up the lik and proc objects for LS fitting
 
-lambda = 1e-4;
+lambda = 1e4;
+
+ChemoMeas = @(t,x,p,more) [log(exp(x(:,2)) + exp(x(:,3))) + p(1), log(exp(x(:,4)) + exp(x(:,5))) + p(2)]
+
 [lik, proc] = LS_setup(@chemo_fun, ChemoTime, coefs0, ChemoBasis, ...
-                       lambda, [], @ChemoMeas, ChemoData, [], [], ...
-                       [], 0, 1);
+                       lambda, [],[], ChemoData, [], [], ...
+                       [], 0, 1,[],ChemoMeas);
 
 %  The starting coefficient matrix for the inner optimizations must be
 %  declared global and then defined at this point.  This is required
@@ -250,13 +254,13 @@ xlabel('days')
 
 
 control_in = optimset('LargeScale', 'on', 'GradObj', 'on', ...
-                      'Hessian', 'off', 'Diagnostics', 'off', ...
-                      'Display', 'off', ...
+                      'Hessian', 'off', 'Diagnostics', 'on', ...
+                      'Display', 'iter', ...
                       'MaxIter', 400);
 
 
 control_out = optimset('LargeScale', 'off', 'GradObj', 'off', ...
-                      'Hessian', 'off', 'Diagnostics', 'off', ...
+                      'Hessian', 'off', 'Diagnostics', 'on', ...
                       'MaxIter', 0, ...
                       'Display', 'iter');
 

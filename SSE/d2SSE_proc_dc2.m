@@ -19,13 +19,15 @@ weights = checkweights(more.weights,whichobs,H1(:,:,1));
 m = size(bvals.bvals,2);
 n = size(devals,2);
 H = cell(n,n);
+
+% Using sparse() to take advantage of operations on sparse matrices
 for i = 1:n
     for j = 1:n
-        H{i,j} = bvals.bvals' *diag(H1(:,i,j))              *bvals.bvals - ...
-               2*bvals.dbvals'*diag(H2(:,i,j).*weights(:,i))*bvals.bvals - ...
-               2*bvals.bvals' *diag(H2(:,j,i).*weights(:,j))*bvals.dbvals;
+        H{i,j} = bvals.bvals' *sparse(diag(H1(:,i,j)))              *bvals.bvals - ...
+               2*bvals.dbvals'*sparse(diag(H2(:,i,j).*weights(:,i)))*bvals.bvals - ...
+               2*bvals.bvals' *sparse(diag(H2(:,j,i).*weights(:,j)))*bvals.dbvals;
     end
-    H{i,i} = H{i,i} + 2*bvals.dbvals'*diag(weights(:,i))*bvals.dbvals;
+    H{i,i} = H{i,i} + 2*bvals.dbvals'*sparse(diag(weights(:,i)))*bvals.dbvals;
 end
 Hmat = blocks2mat(H);
 dc2val = Hmat;

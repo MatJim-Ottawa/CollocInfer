@@ -24,6 +24,7 @@ end
 tmp     = make_SSElik;
 g1      = tmp.dfdx(ddevals,more.qpts,devals,pars,more);
 weights = checkweights(more.weights,whichobs,g1);
+% g1      = weights.*g1;
 term2   = more.fn(more.qpts,devals,pars,more.more);
 g2      = weights.*(ddevals - term2);
 dcval   = reshape(bvals.bvals'*g1 + 2*bvals.dbvals'*g2,m,n,1);

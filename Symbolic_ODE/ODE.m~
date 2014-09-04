@@ -210,11 +210,13 @@ classdef ODE < handle
 %         
 %             TODO:
 %                 -Lots of error handling
+%
 % 
 %           Creates a vector of all the symbolic variables needed to
 %           compute the derivatives
           X = [thisODE.statevector_Symbolic,thisODE.paramvector_Symbolic];
-                    
+          
+          
 %           Computes the Jacobian
           Jf = thisODE.Jacobian(thisODE.DE_Symbolic,X);
           
@@ -224,6 +226,7 @@ classdef ODE < handle
 %           Set this value so that displayResult() need to rerun this 
 %           portion
           thisODE.Display_Symbolic{1} = dfdx;
+
 
 %           Using this symoblic varaible to maintain the shape of the 
 %           matrix. It will be substituted with 0 later in make().
@@ -236,7 +239,8 @@ classdef ODE < handle
           fn_hidden(trick,X,thisODE.time_Symbolic) = fn_out;
           
           f.fn = matlabFunction(fn_hidden);
-                    
+          
+          
           dfdx_out = reshape(dfdx + ...
                    trick*thisODE.statevector_Symbolic(1), ...
                    size(dfdx,1)*size(dfdx,2),1);          

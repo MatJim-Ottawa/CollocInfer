@@ -8,6 +8,8 @@ if nargin < 5
     allpars = pars;
 end
 
+disp(pars)
+disp(active)
 allpars(active) = pars;
 fnval   = proc.fn(  coefs,proc.bvals,allpars,proc.more);
 dfdpval = proc.dfdp(coefs,proc.bvals,allpars,proc.more);
