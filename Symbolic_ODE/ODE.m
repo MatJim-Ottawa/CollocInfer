@@ -12,8 +12,6 @@ classdef ODE < handle
 %           - Write unit testing
 %           - Added dependency on LogTrans, needs to be tested!?
 
-
-
     
     properties(Access=private)
     %Internal variables not exposed to user.
@@ -179,7 +177,7 @@ classdef ODE < handle
                          [' log scale!'])
                 case {1}
                     disp(['NOTE: ODE will NO LONGER accept state '], ...
-                          'vector on log scale!'])
+                          ['vector on log scale!'])
             end
             
             % Switch value of exp_paramvector_bool
@@ -235,6 +233,7 @@ classdef ODE < handle
                            size(thisODE.DE_Symbolic,2),1);
           fn_hidden(trick,X,thisODE.time_Symbolic) = fn_out;
           
+          
           f.fn = matlabFunction(fn_hidden);
                     
           dfdx_out = reshape(dfdx + ...
@@ -283,8 +282,10 @@ classdef ODE < handle
             fn_new = @(t,y) fn.fn(t,y,p_init,more);
             [T,Y] = ode45(fn_new,trange,x_init);
             figure();
-            plot(Y(:,1),Y(:,2));
-            
+            hold on;
+            plot(T,Y(:,1));
+            plot(T,Y(:,2));
+            hold off;
         end
         
         function [T,Y] = generateData(thisODE,trange,x_init, ...
@@ -316,6 +317,112 @@ classdef ODE < handle
     %  ----------------------  Second methods block  ----------------------
     
     methods
+        
+        % find functions
+        % Return list of functions
+
+        function [] = find_functions( aCharString )
+            % Will Identify the beginning of functions
+            % Have to find the closing bracket of each to find end of defn
+            regexDef = '\w+\(';
+
+            % Get strings that match
+            [o,o1] = regexp(aCharString, regexDef,'match');
+
+
+            % Loop for each function found
+            for i=1:length(o1)
+
+
+                function_start_index       = [];
+                param_start_index          = [];
+                param_end_index            = [];
+
+
+                % Get first open bracket
+                index_ = o1(i);
+
+                while(aCharString(index_) ~= '(')
+
+                    %Found the start of the function name
+                    if( ~isempty(regexp(aCharString(index_),'[a-zA-Z]')) && isempty(function_start_index) )
+                        function_start_index = index_;
+                    end
+
+
+                    index_ = index_ + 1;
+                end
+
+                % set start_index
+                param_start_index = index_;
+
+                count_open = 1;
+                count_closed = 0;
+
+                while( count_open ~= count_closed && index_ ~= (length(aCharString) + 1))
+
+                    index_ = index_ + 1;
+
+                    if ( aCharString(index_) == '(' ) 
+                        count_open = count_open + 1;
+                    end
+
+                    if ( aCharString(index_) == ')' ) 
+                        count_closed = count_closed + 1;
+                    end
+
+                end
+
+                param_end_index = index_;
+
+                disp(['Full function:' aCharString( function_start_index:param_end_index) ])
+
+                params_string = aCharString( param_start_index:param_end_index);
+
+                disp(['Parameters:' aCharString( param_start_index:param_end_index)])
+
+
+                params = find_parameters( params_string );
+
+                for j=1:length(params)
+
+                    disp(['Found: ' params{j}]);
+
+                end
+
+            end    
+
+        end
+
+        %Find variables in a string function SYMVAR might work for this.
+        function [ result_ ] = find_parameters( aCharString )
+
+            regexDef    = '[a-zA-Z]\w*(.){0,1}';
+            result_     = {};
+
+            % Get strings that match
+            [output_] = regexp(aCharString, regexDef,'match');
+
+            if ( ~isempty(output_) )
+
+                %Drop all the ones with '(', not the best written code here
+                for i=1:length(output_)
+
+                    if (  ~isempty(strfind(output_{i},'(')) )
+
+                        continue;
+
+                    end
+
+                    result_{length(result_) + 1} = strjoin(regexp(output_{i}, '\w+', 'match'));
+                end
+
+            end
+
+            %Get Distinct values
+            result_ = unique( result_);
+
+        end
         
         function result = Jacobian(~,F,y)
             % Replace the symbolic Jacobian. Will compute Jacobian on each
