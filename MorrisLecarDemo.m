@@ -52,7 +52,7 @@ MLPars = [ 0; %I:
     
 y0 = [-10, 0.014915];
 
-MLTime = 0:100;
+MLTime = 0:1000;
 
 MLParsNames = ['V'; 'N'];
 
@@ -60,14 +60,15 @@ MLParsNames = ['V'; 'N'];
 
 active = [1:13];     
 
-% We'll choose a fairly large value of lambda.? 
+% We'll choose a value of lambda.? 
 
-lambda = 200.*ones(2,1);  
+lambda =   1.*ones(2,1);  
+% lambda = 200.*ones(2,1);  
 
 % We need some basis functions
 
 rg      = [0,max(MLTime)];
-knots   = rg(1):0.5:rg(2); %  200 intervals
+knots   = rg(1):1.0:rg(2); %  200 intervals
 nbasis  = length(knots)+2; %  order four
 MLBasis = create_bspline_basis(rg,nbasis,4,knots);
 

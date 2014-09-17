@@ -175,10 +175,10 @@ classdef ODE < handle
             % Message to user.
             switch thisODE.log_statevector_bool
                 case {0}
-                    disp(['NOTE: ODE will now accept state vector on'], ...
-                         [' log scale!'])
+                    disp(['NOTE: ODE will now accept state vector on ', ...
+                          ' log scale!'])
                 case {1}
-                    disp(['NOTE: ODE will NO LONGER accept state '], ...
+                    disp(['NOTE: ODE will NO LONGER accept state ', ...
                           'vector on log scale!'])
             end
             
