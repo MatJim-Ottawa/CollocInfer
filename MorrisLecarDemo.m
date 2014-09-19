@@ -29,9 +29,9 @@ add_collocinfer_paths_local
 % p(11)V_3:  tuning parameter
 % p(12)V_4:  tuning parameter
 % p(13)phi:  This is a constant?
+   
 
-
-MLPars = [ 0; %I:
+MLPars = [ 150; %I:
           20; %C: 
           2;  %g_L: 
          4.4; %g_Ca: 
@@ -50,7 +50,7 @@ MLPars = [ 0; %I:
 % x(1) N: recovery variable, the probability that the K+ channel is
 % conducting
     
-y0 = [-10, 0.014915];
+y0 = [-35,    0.0149];
 
 MLTime = 0:1000;
 
@@ -85,14 +85,14 @@ ML = make_ODE_Morris_Lecar();
 plot(odetrajt, odetrajy)
 
 rng(1);
-MLData = odetrajy + [ones(size(odetrajy,1),1)*0.1,ones(size(odetrajy,1),1)*0.01].*randn(size(odetrajy,1),size(odetrajy,2));
+MLData = odetrajy + [ones(size(odetrajy,1),1),ones(size(odetrajy,1),1)].*randn(size(odetrajy,1),size(odetrajy,2));
 
 plot(odetrajy(:,1),odetrajy(:,2))
-
+pause;
 
 %  smooth the trajectories and display results
 
-DEfd = smooth_basis(MLTime, odetrajy, ...
+DEfd = smooth_basis(MLTime, MLData, ...
                     fdPar(MLBasis,int2Lfd(2),1e-6));
            
 plotfit_fd(odetrajy, MLTime, DEfd)
