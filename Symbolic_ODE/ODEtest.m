@@ -1,10 +1,12 @@
-classdef ODE < handle
+classdef ODEtest < handle
 %% ODE Class  
 % Idea is to give a symbolic representation of the ODE. 
 % Calculates all the necessary functions based on symbolic package.
 %
 % TODO:
-%           - Add data property to ODE             
+%           - Add data property to ODE
+%           - Graphing data + ode?                
+%           - Generate data from ODE, add noise
 %           - log data at source function?        
 %           - Export functions to file?
 %           - Write unit testing
@@ -61,7 +63,7 @@ classdef ODE < handle
     %  ----------------------  First methods block  -----------------------
     
     methods
-        function thisODE = ODE(f,t,x,p)
+        function thisODE = ODEtest(f,t,x,p)
 %              ODE Contructor function for ODE Class
 %              Arguments:
 %               All four arguments are required.
@@ -355,7 +357,7 @@ classdef ODE < handle
         end
 
         %Find variables in a string function SYMVAR might work for this.
-        function [ result_ ] = find_parameters(thisODE,aCharString )
+        function [ result_ ] = find_parameters( thisODE,aCharString )
 
             regexDef    = '[a-zA-Z]\w*(.){0,1}';
             result_     = {};
