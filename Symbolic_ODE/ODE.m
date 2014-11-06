@@ -76,7 +76,7 @@ classdef ODE < handle
 %             TODO:
 %                 -Lots of error handling
 
-            disp('ODE Version: 13 March 2014 (Mathieu)')
+            disp('ODE Version: 05 November 2014 (Mathieu)')
 %              
 %           Initialize:
 %             
@@ -245,12 +245,13 @@ classdef ODE < handle
         end
         
         function [out] = doWork(thisODE,fn_in)
-            R = reshape(fn_in, size(fn_in,1)*size(fn_in,2),1);
+            syms size_var;
+            R = reshape(fn_in + size_var*thisODE.time_Symbolic, size(fn_in,1)*size(fn_in,2),1);
             
             % Fix the order of the input variables;
             F = char(matlabFunction(R));
             
-            x = [thisODE.time_Symbolic, thisODE.statevector_Symbolic, thisODE.paramvector_Symbolic];
+            x = [size_var,thisODE.time_Symbolic, thisODE.statevector_Symbolic, thisODE.paramvector_Symbolic];
             
             s = char();            
             for i=1:length(x)
@@ -467,9 +468,9 @@ classdef ODE < handle
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
-            pcol = num2cell(p,1);
+            pcol = num2cell(p,1); 
             
-            res = thisODE.f_struc_representation.fn(t,xcol{:},pcol{:});
+            res = thisODE.f_struc_representation.fn(0,t,xcol{:},pcol{:});
             if isvector(x) == 1
                 result = reshape(res,length(x),1);
                 
@@ -496,13 +497,20 @@ classdef ODE < handle
                 p = exp(p);
             end
             
-            
+            %             Need p to be a row vector.
+            if isvector(p) == 0
+                disp('p is not a vector!')
+            end
+            p = reshape(p,1,length(p));
+            if isvector(x) == 1
+                x = reshape(x,1,length(x));
+            end
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
-            res = thisODE.f_struc_representation.dfdx(t,xcol{:},pcol{:});
+            res = thisODE.f_struc_representation.dfdx(0,t,xcol{:},pcol{:});
             result = reshape(res, length(xcol{1}), length(xcol), ...
                 length(xcol));
             
@@ -531,13 +539,20 @@ classdef ODE < handle
                 p = exp(p);
             end
             
-            
+            %             Need p to be a row vector.
+            if isvector(p) == 0
+                disp('p is not a vector!')
+            end
+            p = reshape(p,1,length(p));
+            if isvector(x) == 1
+                x = reshape(x,1,length(x));
+            end            
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
-            res = thisODE.f_struc_representation.dfdp(t,xcol{:},pcol{:});
+            res = thisODE.f_struc_representation.dfdp(0,t,xcol{:},pcol{:});
             result = reshape(res, length(xcol{1}), length(xcol), ...
                 length(pcol));
             
@@ -563,13 +578,22 @@ classdef ODE < handle
             if thisODE.exp_paramvector_bool == 1
                 p = exp(p);
             end
+
+            %             Need p to be a row vector.
+            if isvector(p) == 0
+                disp('p is not a vector!')
+            end
+            p = reshape(p,1,length(p));
+            if isvector(x) == 1
+                x = reshape(x,1,length(x));
+            end
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
             res    = ...
-                thisODE.f_struc_representation.d2fdx2(t,xcol{:},pcol{:});
+                thisODE.f_struc_representation.d2fdx2(0,t,xcol{:},pcol{:});
             result = reshape(res, length(xcol{1}), length(xcol), ...
                 length(xcol),length(xcol));
             
@@ -607,13 +631,21 @@ classdef ODE < handle
                 p = exp(p);
             end
             
+            %             Need p to be a row vector.
+            if isvector(p) == 0
+                disp('p is not a vector!')
+            end
+            p = reshape(p,1,length(p));
+            if isvector(x) == 1
+                x = reshape(x,1,length(x));
+            end
             
             t = reshape(t,length(t),1);
             xcol = num2cell(x,1);
             pcol = num2cell(p,1);
             
             res    = ...
-                thisODE.f_struc_representation.d2fdxdp(t,xcol{:},pcol{:});
+                thisODE.f_struc_representation.d2fdxdp(0,t,xcol{:},pcol{:});
             result = reshape(res, length(xcol{1}), length(xcol), ...
                 length(xcol),length(pcol));
             

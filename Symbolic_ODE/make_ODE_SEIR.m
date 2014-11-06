@@ -19,7 +19,7 @@ f = [-( B*x(1)*(p(2) + x(3)) ) + p(1) - p(3)*x(1);
      p(4)*x(2) - p(5)*x(3) - p(3)*x(3)];
 
 % Create an instance of ODE  
-odeproblem = ODEtest(f,t,x,p);
+odeproblem = ODE(f,t,x,p);
 
 % Set the ode to use exp(p) in functions; 
 % odeproblem.SetExponentialParameter();
