@@ -391,8 +391,12 @@ classdef ODE < handle
             fn_new = @(t,y) fn.fn(t,y,p_init,more);
             [T,Y] = ode45(fn_new,trange,x_init);
             figure();
+            subplot(3,1,1);
             plot(Y(:,1),Y(:,2));
-            
+            subplot(3,1,2);
+            plot(T,Y(:,1));
+            subplot(3,1,3);
+            plot(T,Y(:,2));
         end
         
         function [T,Y] = generateData(thisODE,trange,x_init, ...
