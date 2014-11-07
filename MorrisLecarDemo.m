@@ -140,3 +140,8 @@ tic;
 coefs1 = inneropt(MLTime, MLData, MLPars, lik, proc, ...
                   [], control_in);
 toc
+
+
+ML_ProfileLS = Profile_LS(ML,MLTime,MLData,coefs1,...
+                            MLPars,MLBasis,lambda);
+
